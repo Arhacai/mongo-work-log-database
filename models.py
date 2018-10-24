@@ -1,6 +1,4 @@
-import datetime
 import pymongo
-
 from pymongo import MongoClient
 
 import utils
@@ -93,21 +91,3 @@ class Task:
             }
         )
         self.task = db.tasks.find_one({'_id': self.task['_id']})
-
-
-if __name__ == '__main__':
-
-    test_employee = {
-        "name": "Test User"
-    }
-    test_task = {
-        "name": "Test User",
-        "title": "Test task",
-        "date": datetime.datetime.now(),
-        "time": 20,
-        "notes": "Simple notes"
-    }
-
-    #task = Task().add_task(**test_task)
-    task = Task()
-    task.print()
