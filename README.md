@@ -1,0 +1,1 @@
+# mongo-work-log-database
