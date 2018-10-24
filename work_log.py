@@ -1,6 +1,6 @@
 import datetime
 
-import mongo
+import models
 import utils
 from menu import MainMenu
 
@@ -15,7 +15,7 @@ class WorkLog:
     @classmethod
     def add_task(cls):
         """Add new entry"""
-        employee = mongo.Employee(utils.get_name())
+        employee = models.Employee(utils.get_name())
         new_task = {
             "employee_id": employee.get_id(),
             "title": utils.get_title(),
@@ -23,7 +23,7 @@ class WorkLog:
             "time": utils.get_time(),
             "notes": utils.get_notes()
         }
-        task = mongo.Task.create(**new_task)
+        task = models.Task.create(**new_task)
         task.show()
         input("The entry has been added. Press enter to return to the menu")
 
@@ -38,7 +38,7 @@ class WorkLog:
         """Delete a task for the user selected."""
         answer = input("Do you really want to delete this task? [y/N]: ")
         if answer.lower() == 'y':
-            mongo.db.tasks.delete_one({'_id': tasks[index].task['_id']})
+            models.db.tasks.delete_one({'_id': tasks[index].task['_id']})
             tasks.remove(tasks[index])
             if index > 1:
                 return index - 1

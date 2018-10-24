@@ -1,6 +1,6 @@
 import utils
 from search import TaskSearch
-import mongo
+import models
 
 
 class Menu:
@@ -120,7 +120,7 @@ class TaskMenu(Menu):
         """
         self.index = index
         if tasks is None:
-            self.tasks = [mongo.Task(entry['_id']) for entry in mongo.db.tasks.find()]
+            self.tasks = [models.Task(entry['_id']) for entry in models.db.tasks.find()]
         else:
             self.tasks = tasks
         self.options = [

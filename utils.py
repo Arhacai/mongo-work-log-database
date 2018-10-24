@@ -59,7 +59,7 @@ def get_date(initial=None):
 def get_search_name():
     """Gets the name of the employee from user"""
     clear_screen()
-    from mongo import Employee
+    from models import Employee
     name_list = [emp['name'] for emp in Employee.get_employees()]
     print("List of employees:")
     print("==================")
@@ -78,7 +78,7 @@ def get_search_date():
     the initial date or None.
     """
     clear_screen()
-    from mongo import db, Task
+    from models import db, Task
     tasks = [Task(entry['_id']) for entry in db.tasks.find()]
     date_list = [task.task['date'].strftime('%d/%m/%Y') for task in tasks]
     print("Dates with tasks:")
