@@ -6,8 +6,8 @@ class TaskSearch:
 
     @classmethod
     def search_by_name(cls):
-        employee = models.Employee(utils.get_search_name())
-        entries = employee.get_tasks()
+        employee = utils.get_search_name()
+        entries = models.db.tasks.find({'employee': employee})
         return [models.Task(entry['_id']) for entry in entries]
 
     @classmethod

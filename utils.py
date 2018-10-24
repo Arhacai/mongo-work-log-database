@@ -53,20 +53,20 @@ def get_date(initial=None):
         except ValueError:
             print("Sorry, you must enter a valid date.\n")
         else:
-            return date
+            return date.date()
 
 
 def get_search_name():
     """Gets the name of the employee from user"""
     clear_screen()
-    from models import Employee
-    name_list = [emp['name'] for emp in Employee.get_employees()]
+    from models import Task
+    name_list = Task.employees()
     print("List of employees:")
     print("==================")
     for name in name_list:
         print("- {}".format(name.capitalize()))
     while True:
-        name = input("Employee's Name: ").lower().strip()
+        name = input("\nEmployee's Name: ").lower().strip()
         if name != '' and name in name_list:
             return name
         print("Sorry, you must enter a valid name.\n")
@@ -78,9 +78,8 @@ def get_search_date():
     the initial date or None.
     """
     clear_screen()
-    from models import db, Task
-    tasks = [Task(entry['_id']) for entry in db.tasks.find()]
-    date_list = [task.task['date'].strftime('%d/%m/%Y') for task in tasks]
+    from models import Task
+    date_list = [task.task['date'].strftime('%d/%m/%Y') for task in Task.all()]
     print("Dates with tasks:")
     print("=================")
     for date in date_list:

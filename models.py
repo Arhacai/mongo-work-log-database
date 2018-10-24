@@ -5,36 +5,11 @@ import utils
 
 client = MongoClient()
 db = client.worklog
-db.employees.create_index([('name', pymongo.ASCENDING)], unique=True)
-db.tasks.create_index([('title', pymongo.TEXT), ('notes', pymongo.TEXT)])
-
-
-class Employee:
-
-    def __init__(self, name):
-        name = name.lower()
-        self.employee = db.employees.find_one({'name': name})
-        if not self.employee:
-            result = db.employees.insert_one({'name': name})
-            self.employee = db.employees.find_one({'_id': result.inserted_id})
-
-    def get_id(self):
-        return self.employee.get('_id', None)
-
-    def get_name(self):
-        return self.employee.get('name', '').title()
-
-    @classmethod
-    def get_employees(cls):
-        return db.employees.find()
-
-    def get_tasks(self):
-        return db.tasks.find({'employee_id': self.get_id()})
-
-    def edit(self):
-        name = utils.get_name(self.get_name())
-        db.employees.update(self.employee, {'name': name})
-        self.employee = db.employees.find_one({'name': name})
+db.tasks.create_index([
+    ('employee', pymongo.ASCENDING),
+    ('title', pymongo.TEXT),
+    ('notes', pymongo.TEXT)
+])
 
 
 class Task:
@@ -46,15 +21,14 @@ class Task:
                 raise IndexError
         except IndexError:
             print("Sorry, there is no tasks with that id")
-        else:
-            self.employee = self.get_employee()
 
-    def get_employee_id(self):
-        return self.task.get('employee_id', None)
+    @classmethod
+    def all(cls):
+        return [Task(entry['_id']) for entry in db.tasks.find()]
 
-    def get_employee(self):
-        employee = db.employees.find_one({'_id': self.get_employee_id()})
-        return Employee(employee['name'])
+    @classmethod
+    def employees(cls):
+        return list(set([task.task['employee'] for task in Task.all()]))
 
     @classmethod
     def create(cls, **kwargs):
@@ -63,8 +37,8 @@ class Task:
 
     def show(self):
         utils.clear_screen()
-        print(self.employee.get_name())
-        print("=" * len(self.employee.employee['name']))
+        print(self.task['employee'].capitalize())
+        print("=" * len(self.task['employee']))
         print("Date: {}".format(self.task['date'].strftime('%d/%m/%Y')))
         print("Task: {}".format(self.task['title']))
         print("Time spent: {} minutes".format(self.task['time']))

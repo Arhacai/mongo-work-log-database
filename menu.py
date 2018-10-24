@@ -120,7 +120,7 @@ class TaskMenu(Menu):
         """
         self.index = index
         if tasks is None:
-            self.tasks = [models.Task(entry['_id']) for entry in models.db.tasks.find()]
+            self.tasks = models.Task.all()
         else:
             self.tasks = tasks
         self.options = [

@@ -15,9 +15,8 @@ class WorkLog:
     @classmethod
     def add_task(cls):
         """Add new entry"""
-        employee = models.Employee(utils.get_name())
         new_task = {
-            "employee_id": employee.get_id(),
+            "employee": utils.get_name(),
             "title": utils.get_title(),
             "date": datetime.datetime.now(),
             "time": utils.get_time(),
