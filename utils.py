@@ -61,7 +61,9 @@ def get_date(initial=None):
 def get_search_name():
     """Gets the name of the employee from user"""
     clear_screen()
-    name_list = list(set([task['employee'] for task in db.tasks.find()]))
+    name_list = sorted(
+        list(set([task['employee'] for task in db.tasks.find()]))
+    )
     print("List of employees:")
     print("==================")
     for name in name_list:

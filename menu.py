@@ -130,7 +130,7 @@ class TaskMenu(Menu):
         """
         if tasks is None:
             tasks = [entry for entry in db.tasks.find()]
-        options = self.get_options(index, len(self.tasks))
+        options = self.get_options(index, len(tasks))
         return index, tasks, options
 
     def get_options(self, index, length):
