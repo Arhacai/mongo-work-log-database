@@ -1,6 +1,8 @@
 import datetime
 import os
 
+from work_log import db
+
 
 def clear_screen():
     """Clear the screen"""
@@ -53,14 +55,13 @@ def get_date(initial=None):
         except ValueError:
             print("Sorry, you must enter a valid date.\n")
         else:
-            return date.date()
+            return date
 
 
 def get_search_name():
     """Gets the name of the employee from user"""
     clear_screen()
-    from models import Task
-    name_list = Task.employees()
+    name_list = list(set([task['employee'] for task in db.tasks.find()]))
     print("List of employees:")
     print("==================")
     for name in name_list:
@@ -78,8 +79,7 @@ def get_search_date():
     the initial date or None.
     """
     clear_screen()
-    from models import Task
-    date_list = [task.task['date'].strftime('%d/%m/%Y') for task in Task.all()]
+    date_list = [task['date'].strftime('%d/%m/%Y') for task in db.tasks.find()]
     print("Dates with tasks:")
     print("=================")
     for date in date_list:
@@ -146,14 +146,14 @@ def get_notes(initial=None):
     Gets notes from user. If no notes provided, it returns the initial
     notes or None.
     """
-    if not initial:
+    if initial is None:
         clear_screen()
     notes = input("Notes (Optional, you can leave this empty): ").strip()
     if notes:
         return notes
     if not initial:
         return ''
-    answer = input("Do you want to keep actual notes? y/N").lower()
+    answer = input("Do you want to keep actual notes? y/N ").lower()
     if answer == 'y':
         return initial
     return ''

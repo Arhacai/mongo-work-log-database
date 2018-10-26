@@ -1,6 +1,6 @@
 import utils
 from search import TaskSearch
-import models
+from work_log import db, WorkLog
 
 
 class Menu:
@@ -61,7 +61,6 @@ class MainMenu(Menu):
             self.print_menu()
             option = self.get_option()
             if option == 'a':
-                from work_log import WorkLog
                 WorkLog.add_task()
             if option == 'b':
                 SearchMenu().run()
@@ -109,7 +108,18 @@ class SearchMenu(Menu, TaskSearch):
 
 class TaskMenu(Menu):
 
+    options = [
+        ('p', '[P]revious'),
+        ('n', '[N]ext'),
+        ('e', '[E]dit'),
+        ('d', '[D]elete'),
+        ('r', '[R]eturn'),
+    ]
+
     def __init__(self, index=0, tasks=None):
+        self.index, self.tasks, self.options = self.initialize(index, tasks)
+
+    def initialize(self, index=0, tasks=None):
         """
         Initializes the menu with a proper options. By default, index is 0
         so the first task in the list is shown. If no tasks provided, this
@@ -118,19 +128,10 @@ class TaskMenu(Menu):
         depending on the index of the task shown, so options are changed
         on __init__ in each case.
         """
-        self.index = index
         if tasks is None:
-            self.tasks = models.Task.all()
-        else:
-            self.tasks = tasks
-        self.options = [
-            ('p', '[P]revious'),
-            ('n', '[N]ext'),
-            ('e', '[E]dit'),
-            ('d', '[D]elete'),
-            ('r', '[R]eturn'),
-        ]
-        self.options = self.get_options(index, len(self.tasks))
+            tasks = [entry for entry in db.tasks.find()]
+        options = self.get_options(index, len(self.tasks))
+        return index, tasks, options
 
     def get_options(self, index, length):
         """
@@ -151,7 +152,7 @@ class TaskMenu(Menu):
 
     def print_title(self):
         if self.tasks:
-            self.tasks[self.index].show()
+            WorkLog.show_task(self.tasks[self.index])
             print("Result {} of {}\n".format(self.index + 1, len(self.tasks)))
         else:
             print("There are no tasks to show.\n")
@@ -160,7 +161,6 @@ class TaskMenu(Menu):
         print(', '.join([option[1] for option in self.options]))
 
     def run(self):
-        from work_log import WorkLog
         while True:
             self.print_menu()
             option = self.get_option()
@@ -169,10 +169,15 @@ class TaskMenu(Menu):
             if option == 'n':
                 self.index += 1
             if option == 'e':
-                self.index = WorkLog.edit_task(self.index, self.tasks)
+                edited = WorkLog.edit_task(self.tasks[self.index])
+                self.tasks[self.index].update(edited)
             if option == 'd':
-                self.index = WorkLog.delete_task(self.index, self.tasks)
+                if WorkLog.delete_task(self.tasks[self.index]):
+                    self.tasks.remove(self.tasks[self.index])
+                    if self.index > 1:
+                        self.index -= 1
+                    else:
+                        self.index = 0
             if option == 'r':
                 break
-
-            self.__init__(self.index, self.tasks)
+            self.initialize(self.index, self.tasks)

@@ -1,5 +1,5 @@
 import utils
-import models
+from work_log import db
 
 
 class TaskSearch:
@@ -7,37 +7,37 @@ class TaskSearch:
     @classmethod
     def search_by_name(cls):
         employee = utils.get_search_name()
-        entries = models.db.tasks.find({'employee': employee})
-        return [models.Task(entry['_id']) for entry in entries]
+        entries = db.tasks.find({'employee': employee})
+        return [entry for entry in entries]
 
     @classmethod
     def search_by_date(cls):
         """Search by Date of Task"""
         date = utils.get_search_date()
-        entries = models.db.tasks.find({'date': date})
-        return [models.Task(entry['_id']) for entry in entries]
+        entries = db.tasks.find({'date': date})
+        return [entry for entry in entries]
 
     @classmethod
     def search_by_range(cls):
         """Search by Range of Dates"""
         start_date, end_date = utils.get_date_range()
-        entries = models.db.tasks.find(
+        entries = db.tasks.find(
             {'date': {'$lt': end_date, '$gte': start_date}}
         )
-        return [models.Task(entry['_id']) for entry in entries]
+        return [entry for entry in entries]
 
     @classmethod
     def search_by_time(cls):
         """Search by Time Spent"""
         time = utils.get_time()
-        entries = models.db.tasks.find({'time': time})
-        return [models.Task(entry['_id']) for entry in entries]
+        entries = db.tasks.find({'time': time})
+        return [entry for entry in entries]
 
     @classmethod
     def search_by_term(cls):
         """Search by Search Term"""
         term = utils.get_term()
-        entries = models.db.tasks.find(
+        entries = db.tasks.find(
             {
                 '$or': [
                     {'title': {'$regex': term}},
@@ -45,4 +45,4 @@ class TaskSearch:
                 ]
             }
         )
-        return [models.Task(entry['_id']) for entry in entries]
+        return [entry for entry in entries]
